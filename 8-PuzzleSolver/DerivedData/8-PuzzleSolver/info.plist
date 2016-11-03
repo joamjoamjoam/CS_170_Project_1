@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>LastAccessedDate</key>
+	<date>2016-11-03T03:34:29Z</date>
 	<key>WorkspacePath</key>
 	<string>/Users/joamjoamjoam/Documents/School/fall2016/cs170/Individual_Projects/CS_170_Project_1/8-PuzzleSolver/8-PuzzleSolver.xcodeproj</string>
 </dict>

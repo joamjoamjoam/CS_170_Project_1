@@ -10,6 +10,10 @@
 
 @interface ViewController : UIViewController
 
+@property (strong, nonatomic) IBOutlet UITextView *debugConsoleTextView;
+@property NSMutableArray* pqueue;
+@property NSMutableArray* closedList;
+@property NSMutableArray* archive;
 
 @end
 

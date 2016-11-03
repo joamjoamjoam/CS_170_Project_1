@@ -1,4 +1,3 @@
-//
 //  main.m
 //  8-PuzzleSolver
 //

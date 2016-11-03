@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ECAEB5531DC582540003E3DB /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = ECAEB5521DC582530003E3DB /* Node.m */; };
+		ECAEB5571DC59C070003E3DB /* TileLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = ECAEB5561DC59C070003E3DB /* TileLocation.m */; };
 		ECF0CE801DC1826A00E8D9AF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ECF0CE7F1DC1826A00E8D9AF /* main.m */; };
 		ECF0CE831DC1826A00E8D9AF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ECF0CE821DC1826A00E8D9AF /* AppDelegate.m */; };
 		ECF0CE861DC1826B00E8D9AF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ECF0CE851DC1826B00E8D9AF /* ViewController.m */; };
@@ -16,6 +18,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		ECAEB5511DC582530003E3DB /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
+		ECAEB5521DC582530003E3DB /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Node.m; sourceTree = "<group>"; };
+		ECAEB5551DC59C060003E3DB /* TileLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileLocation.h; sourceTree = "<group>"; };
+		ECAEB5561DC59C070003E3DB /* TileLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TileLocation.m; sourceTree = "<group>"; };
 		ECF0CE7B1DC1826A00E8D9AF /* 8-PuzzleSolver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "8-PuzzleSolver.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECF0CE7F1DC1826A00E8D9AF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		ECF0CE811DC1826A00E8D9AF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -39,6 +45,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		ECAEB5541DC5826C0003E3DB /* My Classes */ = {
+			isa = PBXGroup;
+			children = (
+				ECAEB5521DC582530003E3DB /* Node.m */,
+				ECAEB5511DC582530003E3DB /* Node.h */,
+				ECAEB5551DC59C060003E3DB /* TileLocation.h */,
+				ECAEB5561DC59C070003E3DB /* TileLocation.m */,
+			);
+			name = "My Classes";
+			sourceTree = "<group>";
+		};
 		ECF0CE721DC1826900E8D9AF = {
 			isa = PBXGroup;
 			children = (
@@ -67,6 +84,7 @@
 				ECF0CE8C1DC1826B00E8D9AF /* LaunchScreen.storyboard */,
 				ECF0CE8F1DC1826B00E8D9AF /* Info.plist */,
 				ECF0CE7E1DC1826A00E8D9AF /* Supporting Files */,
+				ECAEB5541DC5826C0003E3DB /* My Classes */,
 			);
 			path = "8-PuzzleSolver";
 			sourceTree = "<group>";
@@ -105,7 +123,7 @@
 		ECF0CE731DC1826900E8D9AF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Trent Callan";
 				TargetAttributes = {
 					ECF0CE7A1DC1826900E8D9AF = {
@@ -153,6 +171,8 @@
 				ECF0CE861DC1826B00E8D9AF /* ViewController.m in Sources */,
 				ECF0CE831DC1826A00E8D9AF /* AppDelegate.m in Sources */,
 				ECF0CE801DC1826A00E8D9AF /* main.m in Sources */,
+				ECAEB5571DC59C070003E3DB /* TileLocation.m in Sources */,
+				ECAEB5531DC582540003E3DB /* Node.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -192,8 +212,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -236,8 +258,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -264,6 +288,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				INFOPLIST_FILE = "8-PuzzleSolver/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.joamjoamjoam.--PuzzleSolver";
@@ -275,6 +300,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				INFOPLIST_FILE = "8-PuzzleSolver/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.joamjoamjoam.--PuzzleSolver";
@@ -301,6 +327,7 @@
 				ECF0CE941DC1826C00E8D9AF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
