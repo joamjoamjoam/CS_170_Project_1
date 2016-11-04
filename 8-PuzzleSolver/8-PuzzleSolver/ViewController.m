@@ -26,56 +26,111 @@
 @synthesize pqueue;
 @synthesize archive;
 @synthesize closedList;
+@synthesize goalStateTileOrder;
+@synthesize initialTileOrder;
+@synthesize initialStateTextField;
+@synthesize goalStateTextField;
+@synthesize heuristicSegControl;
 
 NSString* displayText = @"";
-int currNodeIdentifier = -1;
+int currNodeIdentifier = 0;
+NSUInteger maxNodesInQueue = 0;
 
 // need to save and load pqueue, display text and currNodeID between segues and view changes.
 
 
-
+#pragma mark View Lifecycle Methods
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    // Initialize all global objects
+    archive = [[NSMutableArray alloc] initWithCapacity:0];
     pqueue = [[NSMutableArray alloc] initWithCapacity:0];
     closedList = [[NSMutableArray alloc] initWithCapacity:0];
-    // holds all created nodes
-    archive = [[NSMutableArray alloc] initWithCapacity:0];
+    
+    // Default Initializations
+    
+    goalStateTileOrder = [[NSArray alloc] initWithObjects:@1,@2,@3,@4,@5,@6,@7,@8,@0, nil];
+    initialTileOrder = [[NSArray alloc] initWithObjects:@4,@2,@8,@6,@0,@3,@7,@5,@1, nil];
+    initialStateTextField.text = @"5.1.8.6.4.3.7.2.0";
+    goalStateTextField.text = @"1.2.3.4.5.6.7.8.0";
+    
+    //NSArray* initialTileOrder = [[NSArray alloc] initWithObjects:@1,@2,@0,@8,@4,@3,@7,@6,@5,nil];
+}
+
+- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [[self view] endEditing:YES];
+}
+
+
+#pragma mark IBAction Methods
+- (IBAction)solveBtnPressed:(id)sender {
+    displayText = @"";
+    // get initial and goal states from text fields
+    
+    NSMutableArray* initialTileStringArray = [[[initialStateTextField text] componentsSeparatedByString:@"."] mutableCopy];
+    NSMutableArray* goalStateTileStringArray = [[[goalStateTextField text] componentsSeparatedByString:@"."] mutableCopy];
+    
+    
+    if (([goalStateTileStringArray count] == 9) && ([initialTileStringArray count] == 9)) {
+        for (int i = 0; i < [initialTileOrder count]; i++) {
+            NSNumber* tmpInitial = [[NSNumber alloc] initWithInt:[[initialTileStringArray objectAtIndex:i] intValue]];
+            NSNumber* tmpGoal = [[NSNumber alloc] initWithInt:[[goalStateTileStringArray objectAtIndex:i] intValue]];
+            
+            [initialTileStringArray replaceObjectAtIndex:i withObject:tmpInitial];
+            [goalStateTileStringArray replaceObjectAtIndex:i withObject:tmpGoal];
+        }
+    }
+    else{
+        [self debugLog:@"Invalid Inputs to Program"];
+        return;
+    }
+    
+    //[self debugLog:[NSString stringWithFormat:@"%@",initialTileOrder]];
+    
+    
+    
     int nodesExpanded = 0;
-    //NSArray* goalState = [[NSArray alloc] initWithObjects:@1,@2,@3,@4,@0,@5,@6,@7,@8, nil];
-    // implement goal state passing
-    // ask for goal state and initial state
+    maxNodesInQueue = 0;
+    currNodeIdentifier = -1;
+    [pqueue removeAllObjects];
+    [archive removeAllObjects];
+    [closedList removeAllObjects];
+    Node* root;
     
-    NSArray* goalStateTileOrder = [[NSArray alloc] initWithObjects:@0,@1,@2,@3,@4,@5,@6,@7,@8, nil];
+    switch (heuristicSegControl.selectedSegmentIndex) {
+        case 0:
+            // manhattan
+            root = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardStateTileOrder:initialTileOrder heuristicType:MANHATTAN_DISTANCE goalStateTileOrder: goalStateTileOrder andParentNode:nil];
+            [self debugLog:@"Manhattan Heuristic"];
+            break;
+        case 1:
+            // Misplaced Tile
+            root = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardStateTileOrder:initialTileOrder heuristicType:MISPLACED_TILE goalStateTileOrder: goalStateTileOrder andParentNode:nil];
+            [self debugLog:@"Misplaced Tile Heuristic"];
+            break;
+        case 2:
+            // UCS
+            root = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardStateTileOrder:initialTileOrder heuristicType:UNIFORM_COST_SEARCH goalStateTileOrder: goalStateTileOrder andParentNode:nil];
+            [self debugLog:@"Uniform Cost Heuristic"];
+            break;
+            
+        default:
+            break;
+    }
     
-    // initial board state p.s. @ makes int an object
-    NSArray* initialTileOrder = [[NSArray alloc] initWithObjects:@1,@2,@0,@3,@4,@5,@6,@7,@8, nil];
-    // teachers test hard
-    //NSArray* initialTileOrder = [[NSArray alloc] initWithObjects:@4,@2,@8,@6,@0,@3,@7,@5,@1, nil];
-    // teachers test easy
-    //NSArray* initialTileOrder = [[NSArray alloc] initWithObjects:@1,@2,@3,@4,@0,@6,@7,@5,@8, nil];
-    
-    
-    
-    
-    Node* root = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardStateTileOrder:initialTileOrder heuristicType:MISPLACED_TILE goalStateTileOrder: goalStateTileOrder andParentNode:nil];
     [self pushNodeToPQueue:root];
     [archive addObject:root];
-    [self debugLog:[NSString stringWithFormat:@"Root = %@", root]];
     
-    [self debugLog:@"Working ..."];
-    
-    while (![self isGoalStateForNode:[pqueue objectAtIndex:0]] || [pqueue count] == 0) {
-        // when you pop off the node you are expanding you are destroying it like where does the child point to what parent now??
+    while (![self isGoalStateForNode:[pqueue objectAtIndex:0]] && !([pqueue count] == 0)) {
+        nodesExpanded++;
         Node* expandNode = [pqueue objectAtIndex:0];
         
         [closedList addObject:expandNode];
         [self popNodeFromPQueue];
-        
-        //[self debugLog:[NSString stringWithFormat:@"Node %d expanded with depth %.1f and hn %.1f",expandNode.nodeIdentifier,expandNode.depth, expandNode.hn]];
-        
+        //NSLog(@"%@", pqueue);
         expandNode.children = [self expandNode:expandNode];
-        nodesExpanded++;
         
         for(Node* child in expandNode.children){
             // if boardstate doesnt exist in pqueue or closed list then add it to pqueue
@@ -84,42 +139,47 @@ int currNodeIdentifier = -1;
             BOOL foundClosed = NO;
             BOOL foundPqueue = NO;
             
-            for (int i = 0; i < [pqueue count]; i++) {
-                if([child boardStateIsEqualToBoardStateOfNode:[pqueue objectAtIndex:i]]){
-                    // child node found at i
-                    foundPqueue = YES;
-                    float costOfChild = child.depth + child.hn;
-                    float costOfClosedChild = [[pqueue objectAtIndex:i] depth] + [[pqueue objectAtIndex:i] hn];
-                    if(costOfChild < costOfClosedChild){
-                        [pqueue removeObjectAtIndex:i];
-                        [self pushNodeToPQueue:child];
-                        //[self debugLog:[NSString stringWithFormat:@"Node %d was found in pqueue and replaced", child.nodeIdentifier]];
-                    }
-                    else{
-                        //[self debugLog:[NSString stringWithFormat:@"Node %d was found in pqueue and ignored", child.nodeIdentifier]];
-                    }
-                }
-            }
+            // check if boardstate is in closed list
             
             for (int i = 0; i < [closedList count]; i++) {
                 if([child boardStateIsEqualToBoardStateOfNode:[closedList objectAtIndex:i]]){
-                    // child node found at i
+                    // child node found at i in closed list ignore it
                     foundClosed = YES;
-                    float costOfChild = child.depth + child.hn;
-                    float costOfClosedChild = [[closedList objectAtIndex:i] depth] + [[closedList objectAtIndex:i] hn];
-                    if(costOfChild < costOfClosedChild){
-                        [closedList removeObjectAtIndex:i]; // not sure if we should remove it
-                        [self pushNodeToPQueue:child];
-                        //[self debugLog:[NSString stringWithFormat:@"Node %d was found in closedList and replaced", child.nodeIdentifier]];
-                    }
-                    else{
-                        //[self debugLog:[NSString stringWithFormat:@"Node %d was found in closedList and ignored", child.nodeIdentifier]];
-                    }
+                    //NSLog(@"Child already in close list ignore it");
+                    break;
                 }
             }
-            if(!foundClosed && !foundPqueue){
-                [self pushNodeToPQueue:child];
+            if(foundClosed){
+                continue;
             }
+            else{
+                for (int i = 0; i < [pqueue count]; i++) {
+                    if([child boardStateIsEqualToBoardStateOfNode:[pqueue objectAtIndex:i]]){
+                        // child node found at i
+                        foundPqueue = YES;
+                        //NSLog(@"found in pqueue");
+                        float costOfChild = child.depth;
+                        float costOfFoundChild = [[pqueue objectAtIndex:i] depth];
+                        //NSLog(@"%@", pqueue);
+                        if(costOfChild < costOfFoundChild){
+                            [pqueue removeObjectAtIndex:i];
+                            [self pushNodeToPQueue:child];
+                            // child new lower score is updated now update the parent
+                            NSLog(@"Replaced child with better");
+                        }
+                        else{
+                            //[self debugLog:[NSString stringWithFormat:@"Node %d was found in pqueue and ignored", child.nodeIdentifier]];
+                        }
+                    }
+                }
+                
+                if(!foundClosed && !foundPqueue){
+                    [self pushNodeToPQueue:child];
+                }
+            }
+        }
+        if ([pqueue count] > maxNodesInQueue) {
+            maxNodesInQueue = [pqueue count];
         }
     }
     
@@ -128,10 +188,11 @@ int currNodeIdentifier = -1;
         [self debugLog:@"No Solution Found"];
     }
     else{
+        // solution found
         Node* successNode = [pqueue objectAtIndex:0];
-        //[self debugLog:[NSString stringWithFormat:@"Array = %@", pqueue]];
+        
         // trace back node and show path
-        [self debugLog:[NSString stringWithFormat:@"Solution found at node %d in %d Nodes at depth %.1f by expanding %d nodes", successNode.nodeIdentifier,currNodeIdentifier - 1, successNode.depth, nodesExpanded]];
+        [self debugLog:[NSString stringWithFormat:@"Solution found with node %d at depth %.1f\nNodes Expanded %d\nTotal Nodes Created: %d\nMax Queue Length = %lu", successNode.nodeIdentifier,successNode.depth, nodesExpanded, currNodeIdentifier -1,(unsigned long)maxNodesInQueue]];
         
         Node* solWalker = successNode;
         NSString* solutionPath = [[NSString alloc] initWithFormat:@"%d",solWalker.nodeIdentifier];
@@ -141,10 +202,22 @@ int currNodeIdentifier = -1;
         }
         [self debugLog:[NSString stringWithFormat:@"Solution Path = %@",solutionPath]];
     }
-    
-    
-    self.debugConsoleTextView.text = displayText;
 }
+
+
+
+
+-(int) gscoreForNode: (Node *) solWalker{
+    int solutionPath = 0;
+    while (solWalker.parent) {
+        solutionPath++;
+    }
+    return solutionPath +1;
+}
+
+
+
+
 
 
 
@@ -152,8 +225,10 @@ int currNodeIdentifier = -1;
 
 - (void) debugLog: (NSString*) tmp{
     NSLog(@"%@",tmp);
-    NSString* tmp2 = [@"\n > " stringByAppendingString:tmp];
+    NSString* tmp2 = [@"\n" stringByAppendingString:tmp];
     displayText = [displayText stringByAppendingString:tmp2];
+    [debugConsoleTextView setText:displayText];
+    [debugConsoleTextView setNeedsDisplay];
 }
 
 

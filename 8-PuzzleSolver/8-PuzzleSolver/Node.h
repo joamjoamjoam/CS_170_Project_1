@@ -30,6 +30,7 @@ typedef NS_ENUM(NSInteger, HEURISTIC)
 @property int nodeIdentifier;
 @property enum HEURISTIC hnType;
 @property NSArray* goalStateTileOrder;
+@property NSDate* creationDate;
 
 
 

@@ -20,6 +20,7 @@
 @synthesize hnType;
 @synthesize goalStateTileOrder;
 @synthesize nodeIdentifier;
+@synthesize creationDate;
 
 
 - (id) initWithIDNumber: (int) passedNodeIdentifier boardState: (NSMutableArray*) initBoardState heuristicType: (enum HEURISTIC) passedHn goalStateTileOrder: (NSArray *) passedGoalStateTileOrder andParentNode: (Node *) parentNode{
@@ -31,6 +32,7 @@
         self.parent = parentNode;
         self.goalStateTileOrder = passedGoalStateTileOrder;
         self.boardState = initBoardState;
+        self.creationDate = [NSDate date];
         self.depth = parentNode.depth + 1;
         self.tileOrder = [self createTileArrayFromBoardState:initBoardState];
         self.children = [[NSArray alloc] init];
@@ -49,6 +51,7 @@
         self.hnType = passedHn;
         self.nodeIdentifier = passedNodeIdentifier;
         self.tileOrder = initTileOrder;
+        self.creationDate = [NSDate date];
         self.children = [[NSArray alloc] init];
         self.goalStateTileOrder = passedGoalStateTileOrder;
         if(parent){
@@ -101,11 +104,30 @@
 
 - (NSComparisonResult)compare:(Node *)otherNode{
     // A* comparison is sort pqueue in ascending depth + hn Values
-    if ((self.hn + self.depth) < (otherNode.hn + otherNode.depth))
+    /*if ((self.hn + self.depth) < (otherNode.hn + otherNode.depth))
         return NSOrderedAscending;
     else if ((self.hn + self.depth) > (otherNode.hn + otherNode.depth))
         return NSOrderedDescending;
     
+    return NSOrderedSame;*/
+    
+    BOOL currentNodeisMoreRecent = [[creationDate earlierDate:otherNode.creationDate] isEqualToDate: creationDate];
+    
+    if ((self.hn + self.depth) < (otherNode.hn + otherNode.depth)){
+        return NSOrderedAscending;
+    }
+    else if ((self.hn + self.depth) > (otherNode.hn + otherNode.depth)){
+        return NSOrderedDescending;
+    }
+    else{
+        if(!currentNodeisMoreRecent){
+            return NSOrderedAscending;
+        }
+        else{
+            return NSOrderedDescending;
+        }
+        
+    }
     return NSOrderedSame;
 }
 
@@ -142,7 +164,7 @@
 
 - (TileLocation*) locationOfTileForIntInGoalState: (int) numberToLocate{
     TileLocation* numberLocation = nil;
-    if (numberToLocate >= 0 && numberToLocate < [boardState count]) {
+    if (numberToLocate >= 0 && numberToLocate < [goalStateTileOrder count]) {
         for (int i = 0; i < [goalStateTileOrder count]; i++) {
             if(numberToLocate == [[goalStateTileOrder objectAtIndex:i] intValue]){
                 int row = i/[[boardState objectAtIndex:0] count];
@@ -158,7 +180,7 @@
 }
 
 - (NSString*) description{
-    return [NSString stringWithFormat:@"\nNode %d with parent %d, hn %.1f, depth %.1f, and boardstate \n%@ %@ %@\n%@ %@ %@\n%@ %@ %@",nodeIdentifier, [parent nodeIdentifier], hn, depth,[[boardState objectAtIndex:0]objectAtIndex:0],[[boardState objectAtIndex:0]objectAtIndex:1],[[boardState objectAtIndex:0]objectAtIndex:2],[[boardState objectAtIndex:1]objectAtIndex:0],[[boardState objectAtIndex:1]objectAtIndex:1],[[boardState objectAtIndex:1]objectAtIndex:2],[[boardState objectAtIndex:2]objectAtIndex:0],[[boardState objectAtIndex:2]objectAtIndex:1],[[boardState objectAtIndex:2]objectAtIndex:2]];
+    return [NSString stringWithFormat:@"\nNode %d with parent %d, hn %.1f, depth %.1f, date %@ and boardstate \n%@ %@ %@\n%@ %@ %@\n%@ %@ %@",nodeIdentifier, [parent nodeIdentifier], hn, depth, creationDate,[[boardState objectAtIndex:0]objectAtIndex:0],[[boardState objectAtIndex:0]objectAtIndex:1],[[boardState objectAtIndex:0]objectAtIndex:2],[[boardState objectAtIndex:1]objectAtIndex:0],[[boardState objectAtIndex:1]objectAtIndex:1],[[boardState objectAtIndex:1]objectAtIndex:2],[[boardState objectAtIndex:2]objectAtIndex:0],[[boardState objectAtIndex:2]objectAtIndex:1],[[boardState objectAtIndex:2]objectAtIndex:2]];
     
     
     //[[NSString alloc] initWithFormat:@"%@ %@ %@\n%@ %@ %@\n%@ %@ %@",[[boardState objectAtIndex:0]objectAtIndex:0],[[boardState objectAtIndex:0]objectAtIndex:1],[[boardState objectAtIndex:0]objectAtIndex:2],[[boardState objectAtIndex:1]objectAtIndex:0],[[boardState objectAtIndex:1]objectAtIndex:1],[[boardState objectAtIndex:1]objectAtIndex:2],[[boardState objectAtIndex:2]objectAtIndex:0],[[boardState objectAtIndex:2]objectAtIndex:1],[[boardState objectAtIndex:2]objectAtIndex:2]];
@@ -221,7 +243,7 @@
             calculatedHn = 0;
             for (int row = 0; row < [boardState  count]; row++) {
                 for (int collumn = 0; collumn < [[boardState objectAtIndex:0] count]; collumn++) {
-                    int tile = [[[boardState objectAtIndex:row] objectAtIndex:collumn] floatValue];
+                    int tile = [[[boardState objectAtIndex:row] objectAtIndex:collumn] intValue];
                     
                     if(tile > 0){
                         TileLocation* numberLocationInGoalState = [self locationOfTileForIntInGoalState:tile];
@@ -231,7 +253,8 @@
                         
                         int drow = row - targetRow;
                         int dcollumn = collumn - targetCollumn;
-                        calculatedHn = (abs(drow) + abs(dcollumn));
+                    
+                        calculatedHn += (abs(drow) + abs(dcollumn));
                     }
                 }
             }
