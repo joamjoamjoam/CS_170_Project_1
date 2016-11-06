@@ -43,7 +43,7 @@ NSUInteger maxNodesInQueue = 0;
     [super viewDidLoad];
     
     // Initialize all global objects
-    archive = [[NSMutableArray alloc] initWithCapacity:0];
+    //archive = [[NSMutableArray alloc] initWithCapacity:0];
     pqueue = [[NSMutableArray alloc] initWithCapacity:0];
     closedList = [[NSMutableArray alloc] initWithCapacity:0];
     
@@ -89,7 +89,7 @@ NSUInteger maxNodesInQueue = 0;
     maxNodesInQueue = 0;
     currNodeIdentifier = -1;
     [pqueue removeAllObjects];
-    [archive removeAllObjects];
+    //[archive removeAllObjects];
     [closedList removeAllObjects];
     Node* root;
     
@@ -116,7 +116,7 @@ NSUInteger maxNodesInQueue = 0;
     
     
     [self pushNodeToPQueue:root];
-    [archive addObject:root];
+    //[archive addObject:root];
     
     [self debugLog:@"Solving ..."];
     
@@ -186,10 +186,10 @@ NSUInteger maxNodesInQueue = 0;
         Node* solWalker = successNode;
         [solutionTrace addObject:solWalker];
         while (solWalker.parent) {
-            
+            [solutionTrace insertObject:solWalker.parent atIndex:0];
             solWalker = solWalker.parent;
         }
-        [solutionTrace sortUsingSelector:@selector(compare:)];
+        
         for (Node* step in solutionTrace) {
             [self debugLog:[NSString stringWithFormat:@"%@",step]];
         }
@@ -199,13 +199,7 @@ NSUInteger maxNodesInQueue = 0;
         
         
         
-        /*Node* solWalker = successNode;
-        NSString* solutionPath = [[NSString alloc] initWithFormat:@"%d",solWalker.nodeIdentifier];
-        while (solWalker.parent) {
-            solutionPath =  [NSString stringWithFormat:@"%d, %@", solWalker.parent.nodeIdentifier, solutionPath];
-            solWalker = solWalker.parent;
-        }
-        [self debugLog:[NSString stringWithFormat:@"Solution Path = %@",solutionPath]];*/
+        NSLog(@"%@",displayText);
     }
 }
 
@@ -269,8 +263,8 @@ NSUInteger maxNodesInQueue = 0;
         Node* move1ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move1BoardState heuristicType:parent.hnType  goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         
-        [archive addObject:move1ChildNode];
-        [archive addObject:move2ChildNode];
+        //[archive addObject:move1ChildNode];
+        //[archive addObject:move2ChildNode];
         
         
         return [[NSArray alloc] initWithObjects:move1ChildNode, move2ChildNode, nil];
@@ -287,8 +281,8 @@ NSUInteger maxNodesInQueue = 0;
         Node* move1ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move1BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         
-        [archive addObject:move1ChildNode];
-        [archive addObject:move2ChildNode];
+        //[archive addObject:move1ChildNode];
+        //[archive addObject:move2ChildNode];
         
         return [[NSArray alloc] initWithObjects:move1ChildNode, move2ChildNode, nil];
     }
@@ -305,8 +299,8 @@ NSUInteger maxNodesInQueue = 0;
         Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         
         
-        [archive addObject:move1ChildNode];
-        [archive addObject:move2ChildNode];
+        //[archive addObject:move1ChildNode];
+        //[archive addObject:move2ChildNode];
         
         return [[NSArray alloc] initWithObjects:move1ChildNode, move2ChildNode, nil];
     }
@@ -322,8 +316,8 @@ NSUInteger maxNodesInQueue = 0;
         Node* move1ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move1BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         
-        [archive addObject:move1ChildNode];
-        [archive addObject:move2ChildNode];
+        //[archive addObject:move1ChildNode];
+        //[archive addObject:move2ChildNode];
         
         return [[NSArray alloc] initWithObjects:move1ChildNode, move2ChildNode, nil];
     }
@@ -348,10 +342,10 @@ NSUInteger maxNodesInQueue = 0;
         Node* move4ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move4BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         
         
-        [archive addObject:move1ChildNode];
-        [archive addObject:move2ChildNode];
-        [archive addObject:move3ChildNode];
-        [archive addObject:move4ChildNode];
+        //[archive addObject:move1ChildNode];
+        //[archive addObject:move2ChildNode];
+        //[archive addObject:move3ChildNode];
+        //[archive addObject:move4ChildNode];
         
         return [[NSArray alloc] initWithObjects:move1ChildNode, move2ChildNode,move3ChildNode,move4ChildNode, nil];
     }
@@ -375,9 +369,9 @@ NSUInteger maxNodesInQueue = 0;
             Node* move3ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move3BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             
             
-            [archive addObject:move1ChildNode];
-            [archive addObject:move2ChildNode];
-            [archive addObject:move3ChildNode];
+            //[archive addObject:move1ChildNode];
+            //[archive addObject:move2ChildNode];
+            //[archive addObject:move3ChildNode];
             
             return [[NSArray alloc] initWithObjects:move1ChildNode, move2ChildNode,move3ChildNode, nil];
         }
@@ -399,9 +393,9 @@ NSUInteger maxNodesInQueue = 0;
             Node* move3ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move3BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             
             
-            [archive addObject:move1ChildNode];
-            [archive addObject:move2ChildNode];
-            [archive addObject:move3ChildNode];
+            //[archive addObject:move1ChildNode];
+            //[archive addObject:move2ChildNode];
+            //[archive addObject:move3ChildNode];
             
             return [[NSArray alloc] initWithObjects:move1ChildNode, move2ChildNode,move3ChildNode, nil];
             
@@ -424,9 +418,9 @@ NSUInteger maxNodesInQueue = 0;
             Node* move3ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move3BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             
             
-            [archive addObject:move1ChildNode];
-            [archive addObject:move2ChildNode];
-            [archive addObject:move3ChildNode];
+            //[archive addObject:move1ChildNode];
+            //[archive addObject:move2ChildNode];
+            //[archive addObject:move3ChildNode];
             
             return [[NSArray alloc] initWithObjects:move1ChildNode, move2ChildNode,move3ChildNode, nil];
         }
@@ -447,9 +441,9 @@ NSUInteger maxNodesInQueue = 0;
             Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             Node* move3ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move3BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             
-            [archive addObject:move1ChildNode];
-            [archive addObject:move2ChildNode];
-            [archive addObject:move3ChildNode];
+            //[archive addObject:move1ChildNode];
+            //[archive addObject:move2ChildNode];
+            //[archive addObject:move3ChildNode];
             
             return [[NSArray alloc] initWithObjects:move1ChildNode, move2ChildNode,move3ChildNode, nil];
         }
