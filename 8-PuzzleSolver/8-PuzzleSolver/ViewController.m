@@ -36,7 +36,6 @@ NSString* displayText = @"";
 int currNodeIdentifier = 0;
 NSUInteger maxNodesInQueue = 0;
 
-// need to save and load pqueue, display text and currNodeID between segues and view changes.
 
 
 #pragma mark View Lifecycle Methods
@@ -55,7 +54,6 @@ NSUInteger maxNodesInQueue = 0;
     initialStateTextField.text = @"5.1.8.6.4.3.7.2.0";
     goalStateTextField.text = @"1.2.3.4.5.6.7.8.0";
     
-    //NSArray* initialTileOrder = [[NSArray alloc] initWithObjects:@1,@2,@0,@8,@4,@3,@7,@6,@5,nil];
 }
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -87,10 +85,6 @@ NSUInteger maxNodesInQueue = 0;
         return;
     }
     
-    //[self debugLog:[NSString stringWithFormat:@"%@",initialTileOrder]];
-    
-    
-    
     int nodesExpanded = 0;
     maxNodesInQueue = 0;
     currNodeIdentifier = -1;
@@ -120,16 +114,17 @@ NSUInteger maxNodesInQueue = 0;
             break;
     }
     
+    
     [self pushNodeToPQueue:root];
     [archive addObject:root];
+    
+    [self debugLog:@"Solving ..."];
     
     while (![self isGoalStateForNode:[pqueue objectAtIndex:0]] && !([pqueue count] == 0)) {
         nodesExpanded++;
         Node* expandNode = [pqueue objectAtIndex:0];
-        
         [closedList addObject:expandNode];
         [self popNodeFromPQueue];
-        //NSLog(@"%@", pqueue);
         expandNode.children = [self expandNode:expandNode];
         
         for(Node* child in expandNode.children){
@@ -145,7 +140,6 @@ NSUInteger maxNodesInQueue = 0;
                 if([child boardStateIsEqualToBoardStateOfNode:[closedList objectAtIndex:i]]){
                     // child node found at i in closed list ignore it
                     foundClosed = YES;
-                    //NSLog(@"Child already in close list ignore it");
                     break;
                 }
             }
@@ -157,18 +151,15 @@ NSUInteger maxNodesInQueue = 0;
                     if([child boardStateIsEqualToBoardStateOfNode:[pqueue objectAtIndex:i]]){
                         // child node found at i
                         foundPqueue = YES;
-                        //NSLog(@"found in pqueue");
                         float costOfChild = child.depth;
                         float costOfFoundChild = [[pqueue objectAtIndex:i] depth];
-                        //NSLog(@"%@", pqueue);
                         if(costOfChild < costOfFoundChild){
                             [pqueue removeObjectAtIndex:i];
                             [self pushNodeToPQueue:child];
                             // child new lower score is updated now update the parent
-                            NSLog(@"Replaced child with better");
                         }
                         else{
-                            //[self debugLog:[NSString stringWithFormat:@"Node %d was found in pqueue and ignored", child.nodeIdentifier]];
+                            // child found but ignored cause depth was higher
                         }
                     }
                 }
@@ -190,17 +181,31 @@ NSUInteger maxNodesInQueue = 0;
     else{
         // solution found
         Node* successNode = [pqueue objectAtIndex:0];
+        [self debugLog:@"Trace: "];
+        NSMutableArray* solutionTrace = [[NSMutableArray alloc] initWithCapacity:0];
+        Node* solWalker = successNode;
+        [solutionTrace addObject:solWalker];
+        while (solWalker.parent) {
+            
+            solWalker = solWalker.parent;
+        }
+        [solutionTrace sortUsingSelector:@selector(compare:)];
+        for (Node* step in solutionTrace) {
+            [self debugLog:[NSString stringWithFormat:@"%@",step]];
+        }
         
         // trace back node and show path
         [self debugLog:[NSString stringWithFormat:@"Solution found with node %d at depth %.1f\nNodes Expanded %d\nTotal Nodes Created: %d\nMax Queue Length = %lu", successNode.nodeIdentifier,successNode.depth, nodesExpanded, currNodeIdentifier -1,(unsigned long)maxNodesInQueue]];
         
-        Node* solWalker = successNode;
+        
+        
+        /*Node* solWalker = successNode;
         NSString* solutionPath = [[NSString alloc] initWithFormat:@"%d",solWalker.nodeIdentifier];
         while (solWalker.parent) {
             solutionPath =  [NSString stringWithFormat:@"%d, %@", solWalker.parent.nodeIdentifier, solutionPath];
             solWalker = solWalker.parent;
         }
-        [self debugLog:[NSString stringWithFormat:@"Solution Path = %@",solutionPath]];
+        [self debugLog:[NSString stringWithFormat:@"Solution Path = %@",solutionPath]];*/
     }
 }
 
@@ -264,10 +269,6 @@ NSUInteger maxNodesInQueue = 0;
         Node* move1ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move1BoardState heuristicType:parent.hnType  goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         
-        // add to pqueue here tmp
-        //[self pushNodeToPQueue:move1ChildNode];
-        //[self pushNodeToPQueue:move2ChildNode];
-        
         [archive addObject:move1ChildNode];
         [archive addObject:move2ChildNode];
         
@@ -286,10 +287,6 @@ NSUInteger maxNodesInQueue = 0;
         Node* move1ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move1BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         
-        // add to pqueue here tmp
-        //[self pushNodeToPQueue:move1ChildNode];
-        //[self pushNodeToPQueue:move2ChildNode];
-        
         [archive addObject:move1ChildNode];
         [archive addObject:move2ChildNode];
         
@@ -307,9 +304,6 @@ NSUInteger maxNodesInQueue = 0;
         Node* move1ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move1BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         
-        // add to pqueue here tmp
-        //[self pushNodeToPQueue:move1ChildNode];
-        //[self pushNodeToPQueue:move2ChildNode];
         
         [archive addObject:move1ChildNode];
         [archive addObject:move2ChildNode];
@@ -327,10 +321,6 @@ NSUInteger maxNodesInQueue = 0;
         
         Node* move1ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move1BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
-        
-        // add to pqueue here tmp
-        //[self pushNodeToPQueue:move1ChildNode];
-        //[self pushNodeToPQueue:move2ChildNode];
         
         [archive addObject:move1ChildNode];
         [archive addObject:move2ChildNode];
@@ -357,11 +347,6 @@ NSUInteger maxNodesInQueue = 0;
         Node* move3ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move3BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         Node* move4ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move4BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
         
-        // add to pqueue here tmp
-        //[self pushNodeToPQueue:move1ChildNode];
-        //[self pushNodeToPQueue:move2ChildNode];
-        //[self pushNodeToPQueue:move3ChildNode];
-        //[self pushNodeToPQueue:move4ChildNode];
         
         [archive addObject:move1ChildNode];
         [archive addObject:move2ChildNode];
@@ -389,10 +374,6 @@ NSUInteger maxNodesInQueue = 0;
             Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             Node* move3ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move3BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             
-            // add to pqueue here tmp
-            //[self pushNodeToPQueue:move1ChildNode];
-            //[self pushNodeToPQueue:move2ChildNode];
-            //[self pushNodeToPQueue:move3ChildNode];
             
             [archive addObject:move1ChildNode];
             [archive addObject:move2ChildNode];
@@ -417,10 +398,6 @@ NSUInteger maxNodesInQueue = 0;
             Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             Node* move3ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move3BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             
-            // add to pqueue here tmp
-            //[self pushNodeToPQueue:move1ChildNode];
-            //[self pushNodeToPQueue:move2ChildNode];
-            //[self pushNodeToPQueue:move3ChildNode];
             
             [archive addObject:move1ChildNode];
             [archive addObject:move2ChildNode];
@@ -446,10 +423,6 @@ NSUInteger maxNodesInQueue = 0;
             Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             Node* move3ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move3BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             
-            // add to pqueue here tmp
-            //[self pushNodeToPQueue:move1ChildNode];
-            //[self pushNodeToPQueue:move2ChildNode];
-            //[self pushNodeToPQueue:move3ChildNode];
             
             [archive addObject:move1ChildNode];
             [archive addObject:move2ChildNode];
@@ -459,43 +432,20 @@ NSUInteger maxNodesInQueue = 0;
         }
         else if(freeTileLocation.row == 1 && freeTileLocation.collumn == 0){
             // left side
-            //[self displayBoardstate:parent.boardState];
             NSMutableArray* move1BoardState = [self copyBoardState:parent.boardState];
             [self swapTilein:move1BoardState from:[[TileLocation alloc] initWithRow:1 andCollumn:0] toLocation:[[TileLocation alloc] initWithRow:0 andCollumn:0]];
             
-            //[self debugLog:@"after move 1 parent = "];
-            //[self displayBoardstate:parent.boardState];
-            //[self debugLog:@"after move 1 move = "];
-            //[self displayBoardstate:move1BoardState];
             
             NSMutableArray* move2BoardState = [self copyBoardState:parent.boardState];
             [self swapTilein:move2BoardState from:[[TileLocation alloc] initWithRow:1 andCollumn:0] toLocation:[[TileLocation alloc] initWithRow:1 andCollumn:1]];
             
-            //[self debugLog:@"after move 2 parent = "];
-            //[self displayBoardstate:parent.boardState];
-            //[self debugLog:@"after move 2 move = "];
-            //[self displayBoardstate:move2BoardState];
-            
             NSMutableArray* move3BoardState = [self copyBoardState:parent.boardState];
             [self swapTilein:move3BoardState from:[[TileLocation alloc] initWithRow:1 andCollumn:0] toLocation:[[TileLocation alloc] initWithRow:2 andCollumn:0]];
             
-            //[self debugLog:@"after move 3 parent = "];
-            //[self displayBoardstate:parent.boardState];
-            //[self debugLog:@"after move 3 move = "];
-            //[self displayBoardstate:move3BoardState];
             
             Node* move1ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move1BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             Node* move2ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move2BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
             Node* move3ChildNode = [[Node alloc] initWithIDNumber: [self assignNewNodeID] boardState:move3BoardState heuristicType:parent.hnType goalStateTileOrder: parent.goalStateTileOrder andParentNode:parent];
-            
-            //[self debugLog:@"Passed move 2 board state"];
-            //[self displayBoardstate:move2ChildNode.boardState];
-            //[self debugLog:[NSString stringWithFormat:@"Tile 2 -> %@", move2ChildNode.tileOrder]];
-            
-            // add to pqueue here tmp
-            //[self pushNodeToPQueue:move1ChildNode];
-            //[self pushNodeToPQueue:move2ChildNode];
-            //[self pushNodeToPQueue:move3ChildNode];
             
             [archive addObject:move1ChildNode];
             [archive addObject:move2ChildNode];
@@ -515,17 +465,12 @@ NSUInteger maxNodesInQueue = 0;
 
 
 - (void) swapTilein: (NSMutableArray*) boardState from: (TileLocation*) start toLocation: (TileLocation*) end{
-    //[self debugLog:@"start"];
-    //[self displayBoardstate:boardState];
     
     NSNumber* from = [[boardState objectAtIndex:start.row] objectAtIndex:start.collumn];
     NSNumber* to = [[boardState objectAtIndex:end.row] objectAtIndex:end.collumn];
     
     [[boardState objectAtIndex:start.row] replaceObjectAtIndex:start.collumn withObject:to];
     [[boardState objectAtIndex:end.row] replaceObjectAtIndex:end.collumn withObject:from];
-    
-    //[self debugLog:@"end function"];
-    //[self displayBoardstate:boardState];
     
 }
 
